@@ -1,0 +1,274 @@
+FUNCTION countSort :
+DEC VAR_x 20
+DEC VAR_count 40
+DEC VAR_sorted 20
+t1 := #0
+VAR_i := t1
+LABEL label1 :
+t2 := VAR_i
+t3 := #10
+IF t2 < t3 GOTO label2
+GOTO label3
+LABEL label2 :
+t5 := #0
+t6 := VAR_i
+t6 := t6 * #4
+t7 := &VAR_count + t6
+t4 := t7
+*t4 := t5
+t9 := VAR_i
+t10 := #1
+t8 := t9 + t10
+VAR_i := t8
+GOTO label1
+LABEL label3 :
+t11 := #0
+VAR_i := t11
+LABEL label4 :
+t12 := VAR_i
+t13 := #5
+IF t12 < t13 GOTO label5
+GOTO label6
+LABEL label5 :
+READ t15
+t16 := VAR_i
+t16 := t16 * #4
+t17 := &VAR_x + t16
+t14 := t17
+*t14 := t15
+t23 := VAR_i
+t23 := t23 * #4
+t24 := &VAR_x + t23
+t22 := *t24
+t22 := t22 * #4
+t25 := &VAR_count + t22
+t20 := *t25
+t21 := #1
+t19 := t20 + t21
+t27 := VAR_i
+t27 := t27 * #4
+t28 := &VAR_x + t27
+t26 := *t28
+t26 := t26 * #4
+t29 := &VAR_count + t26
+t18 := t29
+*t18 := t19
+t31 := VAR_i
+t32 := #1
+t30 := t31 + t32
+VAR_i := t30
+GOTO label4
+LABEL label6 :
+t33 := #1
+VAR_i := t33
+LABEL label7 :
+t34 := VAR_i
+t35 := #10
+IF t34 < t35 GOTO label8
+GOTO label9
+LABEL label8 :
+t40 := VAR_i
+t40 := t40 * #4
+t41 := &VAR_count + t40
+t38 := *t41
+t43 := VAR_i
+t44 := #1
+t42 := t43 - t44
+t42 := t42 * #4
+t45 := &VAR_count + t42
+t39 := *t45
+t37 := t38 + t39
+t46 := VAR_i
+t46 := t46 * #4
+t47 := &VAR_count + t46
+t36 := t47
+*t36 := t37
+t49 := VAR_i
+t50 := #1
+t48 := t49 + t50
+VAR_i := t48
+GOTO label7
+LABEL label9 :
+t51 := #0
+VAR_i := t51
+LABEL label10 :
+t52 := VAR_i
+t53 := #5
+IF t52 < t53 GOTO label11
+GOTO label12
+LABEL label11 :
+t56 := VAR_i
+t56 := t56 * #4
+t57 := &VAR_x + t56
+t55 := *t57
+t62 := VAR_i
+t62 := t62 * #4
+t63 := &VAR_x + t62
+t61 := *t63
+t61 := t61 * #4
+t64 := &VAR_count + t61
+t59 := *t64
+t60 := #1
+t58 := t59 - t60
+t58 := t58 * #4
+t65 := &VAR_sorted + t58
+t54 := t65
+*t54 := t55
+t71 := VAR_i
+t71 := t71 * #4
+t72 := &VAR_x + t71
+t70 := *t72
+t70 := t70 * #4
+t73 := &VAR_count + t70
+t68 := *t73
+t69 := #1
+t67 := t68 - t69
+t75 := VAR_i
+t75 := t75 * #4
+t76 := &VAR_x + t75
+t74 := *t76
+t74 := t74 * #4
+t77 := &VAR_count + t74
+t66 := t77
+*t66 := t67
+t79 := VAR_i
+t80 := #1
+t78 := t79 + t80
+VAR_i := t78
+GOTO label10
+LABEL label12 :
+t81 := #0
+VAR_i := t81
+LABEL label13 :
+t82 := VAR_i
+t83 := #5
+IF t82 < t83 GOTO label14
+GOTO label15
+LABEL label14 :
+t85 := VAR_i
+t85 := t85 * #4
+t86 := &VAR_sorted + t85
+t84 := *t86
+WRITE t84
+t88 := VAR_i
+t89 := #1
+t87 := t88 + t89
+VAR_i := t87
+GOTO label13
+LABEL label15 :
+t90 := #0
+RETURN t90
+FUNCTION bubbleSort :
+DEC VAR_a 20
+t91 := #0
+VAR_b := t91
+LABEL label16 :
+t92 := VAR_b
+t93 := #5
+IF t92 < t93 GOTO label17
+GOTO label18
+LABEL label17 :
+READ t95
+t96 := VAR_b
+t96 := t96 * #4
+t97 := &VAR_a + t96
+t94 := t97
+*t94 := t95
+t99 := VAR_b
+t100 := #1
+t98 := t99 + t100
+VAR_b := t98
+GOTO label16
+LABEL label18 :
+t101 := #1
+VAR_c := t101
+LABEL label19 :
+t102 := VAR_c
+t103 := #1
+IF t102 == t103 GOTO label20
+GOTO label21
+LABEL label20 :
+t104 := #0
+VAR_c := t104
+t105 := #1
+VAR_b := t105
+LABEL label22 :
+t106 := VAR_b
+t107 := #5
+IF t106 < t107 GOTO label23
+GOTO label24
+LABEL label23 :
+t110 := VAR_b
+t110 := t110 * #4
+t111 := &VAR_a + t110
+t108 := *t111
+t113 := VAR_b
+t114 := #1
+t112 := t113 - t114
+t112 := t112 * #4
+t115 := &VAR_a + t112
+t109 := *t115
+IF t108 < t109 GOTO label25
+GOTO label26
+LABEL label25 :
+t116 := #1
+VAR_c := t116
+t119 := VAR_b
+t120 := #1
+t118 := t119 - t120
+t118 := t118 * #4
+t121 := &VAR_a + t118
+t117 := *t121
+VAR_tem := t117
+t124 := VAR_b
+t124 := t124 * #4
+t125 := &VAR_a + t124
+t123 := *t125
+t127 := VAR_b
+t128 := #1
+t126 := t127 - t128
+t126 := t126 * #4
+t129 := &VAR_a + t126
+t122 := t129
+*t122 := t123
+t131 := VAR_tem
+t132 := VAR_b
+t132 := t132 * #4
+t133 := &VAR_a + t132
+t130 := t133
+*t130 := t131
+LABEL label26 :
+t135 := VAR_b
+t136 := #1
+t134 := t135 + t136
+VAR_b := t134
+GOTO label22
+LABEL label24 :
+GOTO label19
+LABEL label21 :
+t137 := #0
+VAR_b := t137
+LABEL label27 :
+t138 := VAR_b
+t139 := #5
+IF t138 < t139 GOTO label28
+GOTO label29
+LABEL label28 :
+t141 := VAR_b
+t141 := t141 * #4
+t142 := &VAR_a + t141
+t140 := *t142
+WRITE t140
+t144 := VAR_b
+t145 := #1
+t143 := t144 + t145
+VAR_b := t143
+GOTO label27
+LABEL label29 :
+t146 := #0
+RETURN t146
+FUNCTION main :
+NOONE := CALL countSort
+NOONE := CALL bubbleSort
+t147 := #0
+RETURN t147

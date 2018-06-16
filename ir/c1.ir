@@ -1,0 +1,330 @@
+FUNCTION main :
+DEC VAR_place 32
+DEC VAR_row 32
+DEC VAR_ldiag 32
+DEC VAR_rdiag 32
+t1 := #0
+VAR_count := t1
+t2 := #0
+VAR_i := t2
+READ t3
+VAR_n := t3
+LABEL label1 :
+t4 := VAR_i
+t5 := VAR_n
+IF t4 < t5 GOTO label2
+GOTO label3
+LABEL label2 :
+t8 := #1
+t7 := #0 - t8
+t9 := VAR_i
+t9 := t9 * #4
+t10 := &VAR_place + t9
+t6 := t10
+*t6 := t7
+t12 := VAR_i
+t13 := #1
+t11 := t12 + t13
+VAR_i := t11
+GOTO label1
+LABEL label3 :
+t14 := #0
+VAR_i := t14
+t15 := #1
+VAR_cont := t15
+LABEL label4 :
+t16 := VAR_cont
+t17 := #1
+IF t16 == t17 GOTO label5
+GOTO label6
+LABEL label5 :
+t18 := VAR_i
+t19 := VAR_n
+IF t18 == t19 GOTO label7
+GOTO label8
+LABEL label7 :
+t20 := #1
+VAR_valid := t20
+t21 := #0
+VAR_j := t21
+LABEL label10 :
+t22 := VAR_j
+t23 := VAR_n
+IF t22 < t23 GOTO label11
+GOTO label12
+LABEL label11 :
+t25 := #1
+t26 := VAR_j
+t26 := t26 * #4
+t27 := &VAR_row + t26
+t24 := t27
+*t24 := t25
+t29 := #1
+t30 := VAR_j
+t30 := t30 * #4
+t31 := &VAR_ldiag + t30
+t28 := t31
+*t28 := t29
+t33 := #1
+t34 := VAR_j
+t34 := t34 * #4
+t35 := &VAR_rdiag + t34
+t32 := t35
+*t32 := t33
+t37 := VAR_j
+t38 := #1
+t36 := t37 + t38
+VAR_j := t36
+GOTO label10
+LABEL label12 :
+t39 := #0
+VAR_j := t39
+LABEL label13 :
+t40 := VAR_j
+t41 := VAR_n
+IF t40 < t41 GOTO label14
+GOTO label15
+LABEL label14 :
+t45 := VAR_j
+t45 := t45 * #4
+t46 := &VAR_place + t45
+t44 := *t46
+t44 := t44 * #4
+t47 := &VAR_row + t44
+t42 := *t47
+t43 := #1
+IF t42 != t43 GOTO label16
+GOTO label20
+LABEL label20 :
+t51 := VAR_j
+t51 := t51 * #4
+t52 := &VAR_place + t51
+t50 := *t52
+t50 := t50 * #4
+t53 := &VAR_ldiag + t50
+t48 := *t53
+t49 := #1
+IF t48 != t49 GOTO label16
+GOTO label19
+LABEL label19 :
+t57 := VAR_j
+t57 := t57 * #4
+t58 := &VAR_place + t57
+t56 := *t58
+t56 := t56 * #4
+t59 := &VAR_rdiag + t56
+t54 := *t59
+t55 := #1
+IF t54 != t55 GOTO label16
+GOTO label17
+LABEL label16 :
+t60 := #0
+VAR_valid := t60
+t61 := VAR_n
+VAR_j := t61
+GOTO label18
+LABEL label17 :
+t63 := #0
+t65 := VAR_j
+t65 := t65 * #4
+t66 := &VAR_place + t65
+t64 := *t66
+t64 := t64 * #4
+t67 := &VAR_row + t64
+t62 := t67
+*t62 := t63
+t68 := #0
+VAR_k := t68
+LABEL label21 :
+t69 := VAR_k
+t71 := VAR_n
+t72 := #1
+t70 := t71 - t72
+IF t69 < t70 GOTO label22
+GOTO label23
+LABEL label22 :
+t76 := VAR_k
+t77 := #1
+t75 := t76 + t77
+t75 := t75 * #4
+t78 := &VAR_ldiag + t75
+t74 := *t78
+t79 := VAR_k
+t79 := t79 * #4
+t80 := &VAR_ldiag + t79
+t73 := t80
+*t73 := t74
+t82 := VAR_k
+t83 := #1
+t81 := t82 + t83
+VAR_k := t81
+GOTO label21
+LABEL label23 :
+t85 := #1
+t87 := VAR_n
+t88 := #1
+t86 := t87 - t88
+t86 := t86 * #4
+t89 := &VAR_ldiag + t86
+t84 := t89
+*t84 := t85
+t92 := VAR_j
+t92 := t92 * #4
+t93 := &VAR_place + t92
+t90 := *t93
+t91 := #0
+IF t90 != t91 GOTO label24
+GOTO label25
+LABEL label24 :
+t95 := #0
+t99 := VAR_j
+t99 := t99 * #4
+t100 := &VAR_place + t99
+t97 := *t100
+t98 := #1
+t96 := t97 - t98
+t96 := t96 * #4
+t101 := &VAR_ldiag + t96
+t94 := t101
+*t94 := t95
+LABEL label25 :
+t103 := VAR_n
+t104 := #1
+t102 := t103 - t104
+VAR_k := t102
+LABEL label26 :
+t105 := VAR_k
+t106 := #0
+IF t105 > t106 GOTO label27
+GOTO label28
+LABEL label27 :
+t110 := VAR_k
+t111 := #1
+t109 := t110 - t111
+t109 := t109 * #4
+t112 := &VAR_rdiag + t109
+t108 := *t112
+t113 := VAR_k
+t113 := t113 * #4
+t114 := &VAR_rdiag + t113
+t107 := t114
+*t107 := t108
+t116 := VAR_k
+t117 := #1
+t115 := t116 - t117
+VAR_k := t115
+GOTO label26
+LABEL label28 :
+t119 := #1
+t120 := #0
+t120 := t120 * #4
+t121 := &VAR_rdiag + t120
+t118 := t121
+*t118 := t119
+t124 := VAR_j
+t124 := t124 * #4
+t125 := &VAR_place + t124
+t122 := *t125
+t126 := VAR_n
+t127 := #1
+t123 := t126 - t127
+IF t122 != t123 GOTO label29
+GOTO label30
+LABEL label29 :
+t129 := #0
+t133 := VAR_j
+t133 := t133 * #4
+t134 := &VAR_place + t133
+t131 := *t134
+t132 := #1
+t130 := t131 + t132
+t130 := t130 * #4
+t135 := &VAR_rdiag + t130
+t128 := t135
+*t128 := t129
+LABEL label30 :
+t137 := VAR_j
+t138 := #1
+t136 := t137 + t138
+VAR_j := t136
+LABEL label18 :
+GOTO label13
+LABEL label15 :
+t139 := VAR_valid
+t140 := #1
+IF t139 == t140 GOTO label31
+GOTO label32
+LABEL label31 :
+t142 := VAR_count
+t143 := #1
+t141 := t142 + t143
+VAR_count := t141
+LABEL label32 :
+t145 := VAR_i
+t146 := #1
+t144 := t145 - t146
+VAR_i := t144
+GOTO label9
+LABEL label8 :
+LABEL label33 :
+t147 := VAR_i
+t148 := #0
+IF t147 >= t148 GOTO label36
+GOTO label35
+LABEL label36 :
+t151 := VAR_i
+t151 := t151 * #4
+t152 := &VAR_place + t151
+t149 := *t152
+t153 := VAR_n
+t154 := #1
+t150 := t153 - t154
+IF t149 >= t150 GOTO label34
+GOTO label35
+LABEL label34 :
+t157 := #1
+t156 := #0 - t157
+t158 := VAR_i
+t158 := t158 * #4
+t159 := &VAR_place + t158
+t155 := t159
+*t155 := t156
+t161 := VAR_i
+t162 := #1
+t160 := t161 - t162
+VAR_i := t160
+GOTO label33
+LABEL label35 :
+t163 := VAR_i
+t165 := #1
+t164 := #0 - t165
+IF t163 == t164 GOTO label37
+GOTO label38
+LABEL label37 :
+t166 := #0
+VAR_cont := t166
+GOTO label39
+LABEL label38 :
+t171 := VAR_i
+t171 := t171 * #4
+t172 := &VAR_place + t171
+t169 := *t172
+t170 := #1
+t168 := t169 + t170
+t173 := VAR_i
+t173 := t173 * #4
+t174 := &VAR_place + t173
+t167 := t174
+*t167 := t168
+t176 := VAR_i
+t177 := #1
+t175 := t176 + t177
+VAR_i := t175
+LABEL label39 :
+LABEL label9 :
+GOTO label4
+LABEL label6 :
+t178 := VAR_count
+WRITE t178
+t179 := #0
+RETURN t179

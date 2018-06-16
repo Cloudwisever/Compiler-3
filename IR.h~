@@ -8,7 +8,7 @@
 #include "syntax_tree.h"
 #include "symbol_table.h"
 
-#define TEMP_SIZE 1000
+#define TEMP_SIZE 100
 
 
 typedef struct Operand_* Operand;

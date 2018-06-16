@@ -1,0 +1,119 @@
+FUNCTION search :
+PARAM VAR_target
+DEC VAR_x 20
+t1 := #0
+VAR_i := t1
+LABEL label1 :
+t2 := VAR_i
+t3 := #5
+IF t2 < t3 GOTO label2
+GOTO label3
+LABEL label2 :
+READ t5
+t6 := VAR_i
+t6 := t6 * #4
+t7 := &VAR_x + t6
+t4 := t7
+*t4 := t5
+t9 := VAR_i
+t10 := #1
+t8 := t9 + t10
+VAR_i := t8
+GOTO label1
+LABEL label3 :
+t11 := #0
+VAR_left := t11
+t12 := #4
+VAR_right := t12
+LABEL label4 :
+t13 := VAR_left
+t14 := VAR_right
+IF t13 <= t14 GOTO label5
+GOTO label6
+LABEL label5 :
+t18 := VAR_left
+t19 := VAR_right
+t16 := t18 + t19
+t17 := #2
+t15 := t16 / t17
+VAR_index := t15
+t21 := VAR_index
+t21 := t21 * #4
+t22 := &VAR_x + t21
+t20 := *t22
+VAR_middle := t20
+t23 := VAR_middle
+t24 := VAR_target
+IF t23 == t24 GOTO label7
+GOTO label8
+LABEL label7 :
+t25 := VAR_index
+RETURN t25
+LABEL label8 :
+t26 := VAR_middle
+t28 := VAR_left
+t28 := t28 * #4
+t29 := &VAR_x + t28
+t27 := *t29
+IF t26 > t27 GOTO label14
+GOTO label9
+LABEL label14 :
+t30 := VAR_target
+t32 := VAR_left
+t32 := t32 * #4
+t33 := &VAR_x + t32
+t31 := *t33
+IF t30 >= t31 GOTO label13
+GOTO label9
+LABEL label13 :
+t34 := VAR_target
+t35 := VAR_middle
+IF t34 < t35 GOTO label12
+GOTO label9
+LABEL label12 :
+t36 := VAR_middle
+t38 := VAR_left
+t38 := t38 * #4
+t39 := &VAR_x + t38
+t37 := *t39
+IF t36 < t37 GOTO label15
+GOTO label9
+LABEL label15 :
+t40 := VAR_target
+t42 := VAR_left
+t42 := t42 * #4
+t43 := &VAR_x + t42
+t41 := *t43
+IF t40 >= t41 GOTO label9
+GOTO label16
+LABEL label16 :
+t44 := VAR_target
+t45 := VAR_middle
+IF t44 < t45 GOTO label9
+GOTO label10
+LABEL label9 :
+t47 := VAR_index
+t48 := #1
+t46 := t47 - t48
+VAR_right := t46
+GOTO label11
+LABEL label10 :
+t50 := VAR_index
+t51 := #1
+t49 := t50 + t51
+VAR_left := t49
+LABEL label11 :
+GOTO label4
+LABEL label6 :
+t53 := #1
+t52 := #0 - t53
+RETURN t52
+FUNCTION main :
+READ t54
+VAR_n := t54
+t56 := VAR_n
+ARG t56
+t55 := CALL search
+WRITE t55
+t57 := #0
+RETURN t57

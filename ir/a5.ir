@@ -1,0 +1,58 @@
+FUNCTION swap :
+PARAM VAR_a
+PARAM VAR_b
+t1 := VAR_a
+VAR_tem := t1
+t2 := VAR_b
+VAR_a := t2
+t3 := VAR_tem
+VAR_b := t3
+t4 := VAR_a
+WRITE t4
+t5 := VAR_b
+WRITE t5
+t6 := VAR_a
+RETURN t6
+FUNCTION main :
+DEC VAR_x 20
+t7 := #0
+VAR_i := t7
+LABEL label1 :
+t8 := VAR_i
+t9 := #5
+IF t8 < t9 GOTO label2
+GOTO label3
+LABEL label2 :
+READ t11
+t12 := VAR_i
+t12 := t12 * #4
+t13 := &VAR_x + t12
+t10 := t13
+*t10 := t11
+t14 := VAR_i
+t15 := #0
+IF t14 > t15 GOTO label4
+GOTO label5
+LABEL label4 :
+t18 := VAR_i
+t19 := #1
+t17 := t18 - t19
+t17 := t17 * #4
+t20 := &VAR_x + t17
+t16 := *t20
+t22 := VAR_i
+t22 := t22 * #4
+t23 := &VAR_x + t22
+t21 := *t23
+ARG t21
+ARG t16
+NOONE := CALL swap
+LABEL label5 :
+t25 := VAR_i
+t26 := #1
+t24 := t25 + t26
+VAR_i := t24
+GOTO label1
+LABEL label3 :
+t27 := #0
+RETURN t27

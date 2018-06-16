@@ -1,4 +1,5 @@
 FUNCTION main :
+DEC VAR_x 20
 t1 := #0
 VAR_i := t1
 LABEL label1 :
@@ -8,62 +9,100 @@ IF t2 < t3 GOTO label2
 GOTO label3
 LABEL label2 :
 READ t5
+t6 := VAR_i
+t6 := t6 * #4
+t7 := &VAR_x + t6
+t4 := t7
 *t4 := t5
-t7 := VAR_i
-t8 := #1
-t6 := t7 + t8
-VAR_i := t6
+t9 := VAR_i
+t10 := #1
+t8 := t9 + t10
+VAR_i := t8
 GOTO label1
 LABEL label3 :
-t9 := #1
-VAR_i := t9
+t11 := #1
+VAR_i := t11
 LABEL label4 :
-t10 := VAR_i
-t11 := #5
-IF t10 < t11 GOTO label5
+t12 := VAR_i
+t13 := #5
+IF t12 < t13 GOTO label5
 GOTO label6
 LABEL label5 :
-t12 := VAR_i
-VAR_j := t12
+t14 := VAR_i
+VAR_j := t14
 LABEL label7 :
-t13 := VAR_j
-t14 := #0
-IF t13 > t14 GOTO label10
+t15 := VAR_j
+t16 := #0
+IF t15 > t16 GOTO label10
 GOTO label9
 LABEL label10 :
-IF t15 > t16 GOTO label8
+t20 := VAR_j
+t21 := #1
+t19 := t20 - t21
+t19 := t19 * #4
+t22 := &VAR_x + t19
+t17 := *t22
+t23 := VAR_j
+t23 := t23 * #4
+t24 := &VAR_x + t23
+t18 := *t24
+IF t17 > t18 GOTO label8
 GOTO label9
 LABEL label8 :
-VAR_tem := t17
-*t18 := t19
-t21 := VAR_tem
-*t20 := t21
-t23 := VAR_j
-t24 := #1
-t22 := t23 - t24
-VAR_j := t22
+t26 := VAR_j
+t26 := t26 * #4
+t27 := &VAR_x + t26
+t25 := *t27
+VAR_tem := t25
+t31 := VAR_j
+t32 := #1
+t30 := t31 - t32
+t30 := t30 * #4
+t33 := &VAR_x + t30
+t29 := *t33
+t34 := VAR_j
+t34 := t34 * #4
+t35 := &VAR_x + t34
+t28 := t35
+*t28 := t29
+t37 := VAR_tem
+t39 := VAR_j
+t40 := #1
+t38 := t39 - t40
+t38 := t38 * #4
+t41 := &VAR_x + t38
+t36 := t41
+*t36 := t37
+t43 := VAR_j
+t44 := #1
+t42 := t43 - t44
+VAR_j := t42
 GOTO label7
 LABEL label9 :
-t26 := VAR_i
-t27 := #1
-t25 := t26 + t27
-VAR_i := t25
+t46 := VAR_i
+t47 := #1
+t45 := t46 + t47
+VAR_i := t45
 GOTO label4
 LABEL label6 :
-t28 := #0
-VAR_i := t28
+t48 := #0
+VAR_i := t48
 LABEL label11 :
-t29 := VAR_i
-t30 := #5
-IF t29 < t30 GOTO label12
+t49 := VAR_i
+t50 := #5
+IF t49 < t50 GOTO label12
 GOTO label13
 LABEL label12 :
-WRITE t31
-t33 := VAR_i
-t34 := #1
-t32 := t33 + t34
-VAR_i := t32
+t52 := VAR_i
+t52 := t52 * #4
+t53 := &VAR_x + t52
+t51 := *t53
+WRITE t51
+t55 := VAR_i
+t56 := #1
+t54 := t55 + t56
+VAR_i := t54
 GOTO label11
 LABEL label13 :
-t35 := #0
-RETURN t35
+t57 := #0
+RETURN t57

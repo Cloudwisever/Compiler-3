@@ -132,7 +132,7 @@ Operand new_temp()
 	static int temp_count = 0;
 	if(temp_count >= TEMP_SIZE)
 	{
-		printf("more than 1000 temps: %i\n", temp_count);
+		printf("more than 100 temps\n");
 		return NULL;
 	}
 	Operand newOP = (Operand)malloc(sizeof(struct Operand_));

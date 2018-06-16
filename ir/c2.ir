@@ -1,0 +1,213 @@
+FUNCTION trap :
+t1 := #0
+VAR_lh := t1
+t2 := #0
+VAR_lIndex := t2
+t3 := #0
+VAR_i := t3
+t4 := #0
+VAR_count := t4
+t5 := #0
+VAR_thisPool := t5
+t6 := #12
+VAR_n := t6
+t7 := #0
+VAR_rh := t7
+DEC VAR_height 48
+LABEL label1 :
+t8 := VAR_i
+t9 := VAR_n
+IF t8 < t9 GOTO label2
+GOTO label3
+LABEL label2 :
+READ t11
+t12 := VAR_i
+t12 := t12 * #4
+t13 := &VAR_height + t12
+t10 := t13
+*t10 := t11
+t15 := VAR_i
+t16 := #1
+t14 := t15 + t16
+VAR_i := t14
+GOTO label1
+LABEL label3 :
+t17 := #0
+VAR_i := t17
+LABEL label4 :
+t18 := VAR_i
+t19 := VAR_n
+IF t18 < t19 GOTO label7
+GOTO label6
+LABEL label7 :
+t22 := VAR_i
+t22 := t22 * #4
+t23 := &VAR_height + t22
+t20 := *t23
+t21 := #0
+IF t20 == t21 GOTO label5
+GOTO label6
+LABEL label5 :
+t25 := VAR_i
+t26 := #1
+t24 := t25 + t26
+VAR_i := t24
+GOTO label4
+LABEL label6 :
+t27 := VAR_i
+t28 := VAR_n
+IF t27 >= t28 GOTO label8
+GOTO label9
+LABEL label8 :
+t29 := #0
+RETURN t29
+LABEL label9 :
+t31 := VAR_i
+t31 := t31 * #4
+t32 := &VAR_height + t31
+t30 := *t32
+VAR_lh := t30
+t33 := VAR_i
+VAR_lIndex := t33
+t34 := #0
+VAR_thisPool := t34
+t36 := VAR_i
+t37 := #1
+t35 := t36 + t37
+VAR_i := t35
+LABEL label10 :
+t38 := VAR_i
+t39 := VAR_n
+IF t38 < t39 GOTO label11
+GOTO label12
+LABEL label11 :
+t42 := VAR_i
+t42 := t42 * #4
+t43 := &VAR_height + t42
+t40 := *t43
+t41 := VAR_lh
+IF t40 < t41 GOTO label13
+GOTO label14
+LABEL label13 :
+t45 := VAR_thisPool
+t47 := VAR_lh
+t49 := VAR_i
+t49 := t49 * #4
+t50 := &VAR_height + t49
+t48 := *t50
+t46 := t47 - t48
+t44 := t45 + t46
+VAR_thisPool := t44
+GOTO label15
+LABEL label14 :
+t52 := VAR_count
+t53 := VAR_thisPool
+t51 := t52 + t53
+VAR_count := t51
+t55 := VAR_i
+t55 := t55 * #4
+t56 := &VAR_height + t55
+t54 := *t56
+VAR_lh := t54
+t57 := VAR_i
+VAR_lIndex := t57
+t58 := #0
+VAR_thisPool := t58
+LABEL label15 :
+t60 := VAR_i
+t61 := #1
+t59 := t60 + t61
+VAR_i := t59
+GOTO label10
+LABEL label12 :
+t62 := #0
+VAR_thisPool := t62
+t63 := #0
+VAR_rh := t63
+t65 := VAR_n
+t66 := #1
+t64 := t65 - t66
+VAR_i := t64
+LABEL label16 :
+t67 := VAR_i
+t68 := VAR_lIndex
+IF t67 > t68 GOTO label19
+GOTO label18
+LABEL label19 :
+t71 := VAR_i
+t71 := t71 * #4
+t72 := &VAR_height + t71
+t69 := *t72
+t70 := #0
+IF t69 == t70 GOTO label17
+GOTO label18
+LABEL label17 :
+t74 := VAR_i
+t75 := #1
+t73 := t74 - t75
+VAR_i := t73
+GOTO label16
+LABEL label18 :
+t77 := VAR_i
+t77 := t77 * #4
+t78 := &VAR_height + t77
+t76 := *t78
+VAR_rh := t76
+t80 := VAR_i
+t81 := #1
+t79 := t80 - t81
+VAR_i := t79
+LABEL label20 :
+t82 := VAR_i
+t83 := VAR_lIndex
+IF t82 > t83 GOTO label21
+GOTO label22
+LABEL label21 :
+t86 := VAR_i
+t86 := t86 * #4
+t87 := &VAR_height + t86
+t84 := *t87
+t85 := VAR_rh
+IF t84 < t85 GOTO label23
+GOTO label24
+LABEL label23 :
+t89 := VAR_thisPool
+t91 := VAR_rh
+t93 := VAR_i
+t93 := t93 * #4
+t94 := &VAR_height + t93
+t92 := *t94
+t90 := t91 - t92
+t88 := t89 + t90
+VAR_thisPool := t88
+GOTO label25
+LABEL label24 :
+t96 := VAR_count
+t97 := VAR_thisPool
+t95 := t96 + t97
+VAR_count := t95
+t99 := VAR_i
+t99 := t99 * #4
+t100 := &VAR_height + t99
+t98 := *t100
+VAR_rh := t98
+t101 := #0
+VAR_thisPool := t101
+LABEL label25 :
+t103 := VAR_i
+t104 := #1
+t102 := t103 - t104
+VAR_i := t102
+GOTO label20
+LABEL label22 :
+t106 := VAR_count
+t107 := VAR_thisPool
+t105 := t106 + t107
+RETURN t105
+FUNCTION main :
+t108 := CALL trap
+VAR_result := t108
+t109 := VAR_result
+WRITE t109
+t110 := #0
+RETURN t110
