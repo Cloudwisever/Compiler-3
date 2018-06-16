@@ -1,0 +1,69 @@
+FUNCTION main :
+t1 := #0
+VAR_i := t1
+LABEL label1 :
+t2 := VAR_i
+t3 := #5
+IF t2 < t3 GOTO label2
+GOTO label3
+LABEL label2 :
+READ t5
+*t4 := t5
+t7 := VAR_i
+t8 := #1
+t6 := t7 + t8
+VAR_i := t6
+GOTO label1
+LABEL label3 :
+t9 := #1
+VAR_i := t9
+LABEL label4 :
+t10 := VAR_i
+t11 := #5
+IF t10 < t11 GOTO label5
+GOTO label6
+LABEL label5 :
+t12 := VAR_i
+VAR_j := t12
+LABEL label7 :
+t13 := VAR_j
+t14 := #0
+IF t13 > t14 GOTO label10
+GOTO label9
+LABEL label10 :
+IF t15 > t16 GOTO label8
+GOTO label9
+LABEL label8 :
+VAR_tem := t17
+*t18 := t19
+t21 := VAR_tem
+*t20 := t21
+t23 := VAR_j
+t24 := #1
+t22 := t23 - t24
+VAR_j := t22
+GOTO label7
+LABEL label9 :
+t26 := VAR_i
+t27 := #1
+t25 := t26 + t27
+VAR_i := t25
+GOTO label4
+LABEL label6 :
+t28 := #0
+VAR_i := t28
+LABEL label11 :
+t29 := VAR_i
+t30 := #5
+IF t29 < t30 GOTO label12
+GOTO label13
+LABEL label12 :
+WRITE t31
+t33 := VAR_i
+t34 := #1
+t32 := t33 + t34
+VAR_i := t32
+GOTO label11
+LABEL label13 :
+t35 := #0
+RETURN t35

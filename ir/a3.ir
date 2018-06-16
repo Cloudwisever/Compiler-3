@@ -1,0 +1,59 @@
+FUNCTION main :
+READ t1
+VAR_x := t1
+READ t2
+VAR_n := t2
+t3 := VAR_n
+t7 := VAR_n
+t8 := #2
+t5 := t7 / t8
+t6 := #2
+t4 := t5 * t6
+IF t3 == t4 GOTO label1
+GOTO label2
+LABEL label1 :
+t9 := #1
+VAR_result := t9
+GOTO label3
+LABEL label2 :
+t10 := VAR_x
+VAR_result := t10
+LABEL label3 :
+t12 := VAR_n
+t13 := #2
+t11 := t12 / t13
+VAR_n := t11
+LABEL label4 :
+t14 := VAR_n
+t15 := #0
+IF t14 > t15 GOTO label5
+GOTO label6
+LABEL label5 :
+t17 := VAR_x
+t18 := VAR_x
+t16 := t17 * t18
+VAR_x := t16
+t19 := VAR_n
+t23 := VAR_n
+t24 := #2
+t21 := t23 / t24
+t22 := #2
+t20 := t21 * t22
+IF t19 != t20 GOTO label7
+GOTO label8
+LABEL label7 :
+t26 := VAR_result
+t27 := VAR_x
+t25 := t26 * t27
+VAR_result := t25
+LABEL label8 :
+t29 := VAR_n
+t30 := #2
+t28 := t29 / t30
+VAR_n := t28
+GOTO label4
+LABEL label6 :
+t31 := VAR_result
+WRITE t31
+t32 := #0
+RETURN t32
