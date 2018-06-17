@@ -446,13 +446,7 @@ void IRtablePrint(FILE* stream, InterCodes irtable)
 			break;
 		case STAR_ASSIGN_:
 			if(cur->code.u.assign.left == NULL)
-			{
-				if(cur->prev != NULL)
-					cur->prev->next = cur->next;
-				if(cur->next != NULL)
-					cur->next->prev = cur->prev;
 				break;
-			}
 			fputc('*', stream);
 			OperandPrint(stream, cur->code.u.assign.left);
 			fprintf(stream, " := ");
@@ -461,13 +455,7 @@ void IRtablePrint(FILE* stream, InterCodes irtable)
 			break;
 		case _ASSIGN_AND:
 			if(cur->code.u.assign.left == NULL)
-			{
-				if(cur->prev != NULL)
-					cur->prev->next = cur->next;
-				if(cur->next != NULL)
-					cur->next->prev = cur->prev;
 				break;
-			}
 			OperandPrint(stream, cur->code.u.assign.left);
 			fprintf(stream, " := ");
 			fputc('&', stream);
@@ -476,13 +464,7 @@ void IRtablePrint(FILE* stream, InterCodes irtable)
 			break;
 		case _ASSIGN_STAR:
 			if(cur->code.u.assign.left == NULL)
-			{
-				if(cur->prev != NULL)
-					cur->prev->next = cur->next;
-				if(cur->next != NULL)
-					cur->next->prev = cur->prev;
 				break;
-			}
 			OperandPrint(stream, cur->code.u.assign.left);
 			fprintf(stream, " := ");
 			fputc('*', stream);

@@ -6,7 +6,7 @@
 #include"IR.h"
 
 extern FILE* yyin;
-FILE* global_stream;
+FILE* global_stream = stdout;
 #include"syntax_tree.h"
 #include"objectcode.h"
 

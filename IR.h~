@@ -14,7 +14,7 @@
 typedef struct Operand_* Operand;
 struct Operand_
 {
-	enum { VARI, FUNCNAMES, CONSTANT, ADDRESS, TEMP, TEMPADDRESS, RELATOP } kind;
+	enum { VARI, FUNCNAMES, FUNCPARAMA, CONSTANT, ADDRESS, TEMP, TEMPADDRESS, RELATOP } kind;
 	union
 	{
 		int value;
