@@ -1,0 +1,51 @@
+FUNCTION main :
+t1 := #3
+VAR_t := t1
+t2 := #12
+VAR_x := t2
+t6 := VAR_x
+t7 := VAR_x
+t4 := t6 * t7
+t5 := #13
+t3 := t4 + t5
+VAR_b := t3
+t11 := VAR_b
+t12 := #13
+t9 := t11 / t12
+t10 := #1
+t8 := t9 + t10
+VAR_y := t8
+t16 := VAR_x
+t17 := VAR_b
+t14 := t16 / t17
+t18 := VAR_b
+t19 := VAR_y
+t15 := t18 * t19
+t13 := t14 + t15
+VAR_z := t13
+t20 := VAR_z
+WRITE t20
+t22 := VAR_t
+t24 := VAR_z
+t25 := #2
+t23 := t24 * t25
+t21 := t22 + t23
+VAR_c := t21
+t26 := VAR_c
+WRITE t26
+t34 := VAR_x
+t35 := VAR_b
+t32 := t34 + t35
+t33 := VAR_y
+t30 := t32 + t33
+t36 := VAR_x
+t37 := VAR_c
+t31 := t36 / t37
+t28 := t30 + t31
+t29 := VAR_t
+t27 := t28 + t29
+VAR_t := t27
+t38 := VAR_t
+WRITE t38
+t39 := #0
+RETURN t39

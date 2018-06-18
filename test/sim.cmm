@@ -1,0 +1,10 @@
+int main()
+{
+	int x,y,z, a;
+	x = 1;
+	y = 2;
+	z = x + y; 
+	z = y * 4;
+	z = z / 2;
+	return z;
+}

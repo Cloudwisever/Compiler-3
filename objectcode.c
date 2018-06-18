@@ -1,4 +1,5 @@
 #include "objectcode.h"
+char* reglist[32] = {"r0", "at", "v0", "v1", "a0", "a1","a2","a3", "t0","t1","t2","t3","t4","t5","t6","t7", "s0","s1","s2","s3","s4","s5","s6","s7","t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra"};
 
 struct BB_ GenerateBasicBlock(InterCodes head)
 {
@@ -39,6 +40,11 @@ struct BB_ GenerateBasicBlock(InterCodes head)
 	return ret;
 }
 
+void PrintProgramHead(FILE* stream)
+{
+	fprintf(stream, ".data\n_prompt: .asciiz \"Enter an integer:\"\n_ret: .asciiz \"\\n\"\n.globl main\n.text\nread:\nli $v0, 4\n	la $a0, _prompt\n	syscall\n	li $v0, 5\n	syscall\n	jr $ra\nwrite:\n	li $v0, 1\n	syscall\n	li $v0, 4\n	la $a0, _ret\n	syscall\n	move $v0, $0\n	jr $ra\n");
+}
+
 void GenerateObjectCode(InterCodes ircodes)
 {
 	struct BB_ blocks = GenerateBasicBlock(ircodes);
@@ -56,8 +62,25 @@ void GenerateObjectCode(InterCodes ircodes)
 		//if(blocks.code[i]->prev == NULL)
 		//	printf("this is the code without prev:\n");
 		IRPrint(stdout, blocks.code[i]);
-		
 	}
+	if(global_stream != stdout)
+		PrintProgramHead(global_stream);
+	
+	printf("creating positionlist\n");
+	position_list = OIBlistCreate(blocks.code, 0, blocks.length);
+	printf("creatation complete.\n");
+	
+	curfpoff = 4;
+	SelectOC(blocks.code, 0, blocks.length);
+	/*
+	for(hdi = 0; hdi < blocks.leader_length; hdi++)
+	{
+		curfpoff = 4;
+		if(hdi == blocks.leader_length-1)
+			SelectOC(blocks.code, blocks.leader[hdi], blocks.length);
+		SelectOC(blocks.code, blocks.leader[hdi], blocks.leader[hdi+1]);
+	}
+	*/
 }
 OperandsInBlock addOIBlist(OperandsInBlock tail,  Operand op)
 {
@@ -65,7 +88,13 @@ OperandsInBlock addOIBlist(OperandsInBlock tail,  Operand op)
 	memset(newone, 0, sizeof(struct OperandsInBlock_));
 	newone->op = op;
 	newone->remcnt = 1;
+	newone->reg = 0;
 	tail->next = newone;
+	/*
+	printf("add: ");
+	OperandPrint(stdout, newone->op);
+	printf("\n");
+	*/
 	return newone;
 }
 
@@ -76,23 +105,120 @@ OperandsInBlock OIBlistCreate(InterCodes* codes, int start, int end)
 	memset(head, 0, sizeof(struct OperandsInBlock_));
 	tail = head;
 	
+	printf("start: %i. end:%i\n", start, end);
 	for(i = start; i <  end; i++)
 	{
+		IRPrint(stdout, codes[i]);
+		/*
+		if(codes[i]->code.kind == LABEL || codes[i]->code.kind == GOTO)
+			continue;
+		if(codes[i]->code.kind == IFGOTO)
+		{
+			if(codes[i]->code.u.condjmp.op1 != NULL)
+			{
+				if(findOP(head->next, codes[i]->code.u.condjmp.op1) == NULL)
+					tail = addOIBlist(tail, codes[i]->code.u.condjmp.op1);
+				else
+					findOP(head->next, codes[i]->code.u.condjmp.op1)->remcnt++;
+			}
+			if(codes[i]->code.u.binop.op2 != NULL)
+			{
+				if(findOP(head->next, codes[i]->code.u.condjmp.op2) == NULL)
+					tail = addOIBlist(tail, codes[i]->code.u.condjmp.op2);
+				else
+					findOP(head->next, codes[i]->code.u.condjmp.op2)->remcnt++;
+			}
+		}
+		else if(codes[i]->code.kind == DEC)
+		{
+			if(codes[i]->code.u.single.op != NULL)
+			{
+				if(findOP(head->next, codes[i]->code.u.single.op) == NULL)
+					tail = addOIBlist(tail, codes[i]->code.u.single.op);
+				else
+					findOP(head->next, codes[i]->code.u.single.op)->remcnt++;
+			}
+		}
+		else
+		{
+		if(codes[i]->code.u.binop.result != NULL && (codes[i]->code.u.binop.op1->kind == VARI || codes[i]->code.u.binop.op1->kind == ADDRESS||codes[i]->code.u.binop.op1->kind == TEMP || codes[i]->code.u.binop.op1->kind == TEMP))
+		{
+			if(findOP(head->next, codes[i]->code.u.binop.op1) == NULL)
+				tail = addOIBlist(tail, codes[i]->code.u.binop.op1);
+			else
+				findOP(head->next, codes[i]->code.u.binop.op1)->remcnt++;
+		}
+		if(codes[i]->code.u.binop.op1 != NULL && (codes[i]->code.u.binop.op1->kind == VARI || codes[i]->code.u.binop.op1->kind == ADDRESS||codes[i]->code.u.binop.op1->kind == TEMP || codes[i]->code.u.binop.op1->kind == TEMP))
+		{
+			if(findOP(head->next, codes[i]->code.u.binop.op1) == NULL)
+				tail = addOIBlist(tail, codes[i]->code.u.binop.op1);
+			else
+				findOP(head->next, codes[i]->code.u.binop.op1)->remcnt++;
+		}
+		if(codes[i]->code.u.binop.op2 != NULL && (codes[i]->code.u.binop.op2->kind == VARI || codes[i]->code.u.binop.op2->kind == ADDRESS||codes[i]->code.u.binop.op2->kind == TEMP || codes[i]->code.u.binop.op2->kind == TEMP))
+		{
+			if(findOP(head->next, codes[i]->code.u.binop.op2) == NULL)
+				tail = addOIBlist(tail, codes[i]->code.u.binop.op2);
+			else
+				findOP(head->next, codes[i]->code.u.binop.op2)->remcnt++;
+		}
+		}
+		*/
+		
 		if(codes[i]->code.kind >= ASSIGN&&codes[i]->code.kind <= DIVIDE)
 		{
-			if(codes[i]->code.u.binop.op1 != NULL||codes[i]->code.u.binop.op2 != NULL)
+			if(codes[i]->code.u.single.op != NULL)
+			{
+				if(findOP(head->next, codes[i]->code.u.single.op) == NULL)
+					tail = addOIBlist(tail, codes[i]->code.u.single.op);
+				else
+					findOP(head->next, codes[i]->code.u.single.op)->remcnt++;
+			}
+			if(codes[i]->code.u.binop.op1 != NULL)
 			{
 				if(findOP(head->next, codes[i]->code.u.binop.op1) == NULL)
 					tail = addOIBlist(tail, codes[i]->code.u.binop.op1);
 				else
 					findOP(head->next, codes[i]->code.u.binop.op1)->remcnt++;
+			}
+			if(codes[i]->code.u.binop.op2 != NULL)
+			{
 				if(findOP(head->next, codes[i]->code.u.binop.op2) == NULL)
 					tail = addOIBlist(tail, codes[i]->code.u.binop.op2);
 				else
-					findOP(head->next, codes[i]->code.u.binop.op1)->remcnt++;
+					findOP(head->next, codes[i]->code.u.binop.op2)->remcnt++;
 			}
 		}
+		else if(codes[i]->code.kind == READ||codes[i]->code.kind == WRITE || codes[i]->code.kind == RET)
+		{
+			if(codes[i]->code.u.single.op != NULL)
+			{
+				if(findOP(head->next, codes[i]->code.u.single.op) == NULL)
+					tail = addOIBlist(tail, codes[i]->code.u.single.op);
+				else
+					findOP(head->next, codes[i]->code.u.single.op)->remcnt++;
+			}
+		}
+		else if(codes[i]->code.kind == IFGOTO)
+		{
+			if(codes[i]->code.u.condjmp.op1 != NULL)
+			{
+				if(findOP(head->next, codes[i]->code.u.condjmp.op1) == NULL)
+					tail = addOIBlist(tail, codes[i]->code.u.condjmp.op1);
+				else
+					findOP(head->next, codes[i]->code.u.condjmp.op1)->remcnt++;
+			}
+			if(codes[i]->code.u.binop.op2 != NULL)
+			{
+				if(findOP(head->next, codes[i]->code.u.condjmp.op2) == NULL)
+					tail = addOIBlist(tail, codes[i]->code.u.condjmp.op2);
+				else
+					findOP(head->next, codes[i]->code.u.condjmp.op2)->remcnt++;
+			}
+		}
+		
 	}
+	printf("created.\n");
 	return head->next;
 }
 
@@ -111,51 +237,101 @@ int isOperandeq(Operand op1, Operand op2)
 
 OperandsInBlock findOP(OperandsInBlock list, Operand op)
 {
+	if(op == NULL)
+	{
+		printf("op shouldnt be NULL\n");
+		return NULL;
+	}
 	OperandsInBlock cur = list;
 	while(cur != NULL)
 	{
 		if(isOperandeq(cur->op, op))
 			return cur; 
+		cur = cur->next;
 	}
 	return NULL;
 }
 int get_place_on_fp(OperandsInBlock itm)
 {
-	if(itm->pos == 0)
+	OperandsInBlock positm = findOP(position_list, itm->op);
+	if(positm == NULL)
 	{
-		itm->pos = curfpoff+4;
-		curfpoff += 4;
+		printf("cant find the op in position_list.\n");
+		return 0;
 	}
-	return itm->pos;
+	else{
+		if(positm->pos == 0)
+		{
+			positm->pos = curfpoff+4;
+			itm->pos = curfpoff+4;
+			curfpoff += 4;
+		}
+		return positm->pos;
+	}
 }
 
-int ensure(Operand op, OperandsInBlock list, int*reg_status, InterCodes* codes, int start, int end)
+int get_place_for_array(Operand op, int size)
 {
+	OperandsInBlock positm = findOP(position_list, op);
+	if(positm == NULL)
+	{
+		printf("cant find the op in position_list.\n");
+		return 0;
+	}
+	else{
+		if(positm->pos == 0)
+		{
+			curfpoff += size;
+			positm->pos = curfpoff;
+		}
+		return positm->pos;
+	}
+}
+
+int ensure(Operand op, OperandsInBlock list, int*reg_status)
+{
+	/*
+	printf("trying to ensure:");
+	OperandPrint(stdout, op);
+	//*/
 	OperandsInBlock tmp = findOP(list, op);
+	if(tmp == NULL)
+	{
+		printf("operand not in OIBlist.\n");
+		return 0;
+	}
+	int i;
+	/*
+	for(i = 8; i <= 25; i++)
+	{
+		printf("%i, ", reg_status[i]);
+	}
+	printf(",reg = %i\n", tmp->reg);
+	//*/
 	if(tmp->reg != 0)
 		return tmp->reg;
 	else
 	{
-		int result = allocate(list, reg_status);
-		reg_status[result] = 1;
-		tmp->reg = result;
+		int result = allocate(op, list, reg_status);
 		if(op->kind == CONSTANT )
 		{
-			fprintf(global_stream, "lw $%s, %i", reglist[result],op->u.value);
+			fprintf(global_stream, "li $%s, %i\n", reglist[result],op->u.value);
 		}
 		else if(op->kind == VARI || op->kind == TEMP)
 		{
 			int pos = get_place_on_fp(tmp);
-			fprintf(global_stream, "lw $%s, -%i($fp)", reglist[result], pos);
+			fprintf(global_stream, "lw $%s, -%i($fp)\n", reglist[result], pos);
 		}
-		else if(op->kind == ADDRESS || op->kind == TEMPADDRESS)
+		else if(op->kind == ADDRESS)
 		{
 			int pos = get_place_on_fp(tmp);
-			fprintf(global_stream, "la $%s, -%i($fp)", reglist[result], pos);
+			fprintf(global_stream, "la $%s, -%i($fp)\n", reglist[result], pos);
 		}
 		else
 		{
-			printf("unexpected operand type.\n");
+			printf("unexpected operand type:");
+			OperandPrint(stdout, op);
+			printf("\n");
 		}
 		return result;
 	}
@@ -163,39 +339,384 @@ int ensure(Operand op, OperandsInBlock list, int*reg_status, InterCodes* codes, 
 
 void spill(OperandsInBlock itm)
 {
-	if(itm->pos == 0)
+	OperandsInBlock positm = findOP(position_list, itm->op);
+	if(positm == NULL)
 	{
-		itm->pos = curfpoff+4;
-		curfpoff += 4;
-		fprintf(global_stream, "sw $%s, -%i($fp)", reglist[itm->reg], itm->pos*4);
+		printf("cant find the op in position_list.\n");
+		return;
 	}
-	else
-	{
-		fprintf(global_stream, "sw $%s, -%i($fp)", reglist[itm->reg], itm->pos*4);
+	else{
+		if(positm->pos == 0)
+		{
+			positm->pos = curfpoff+4;
+			itm->pos = curfpoff+4;
+			curfpoff += 4;
+			fprintf(global_stream, "sw $%s, -%i($fp)\n", reglist[itm->reg], itm->pos);
+		}
+		else
+		{
+			fprintf(global_stream, "sw $%s, -%i($fp)\n", reglist[itm->reg], itm->pos);
+		}
 	}
 }
 
-int allocate(OperandsInBlock list, int* reg_status)
+int allocate(Operand op, OperandsInBlock list, int* reg_status)
 {
 	int i;
+	/*
+	printf("trying to allocate:");
+	OperandPrint(stdout, op);
+	for(i = 8; i <= 25; i++)
+	{
+		printf("%i, ", reg_status[i]);
+	}
+	//*/
+	OperandsInBlock itm = findOP(list, op);
+	if(itm == NULL)
+	{
+		printf("operand not in OIBlist.\n");
+		return 0;
+	}
+	//printf("reg: %i\n", itm->reg);
+	if(itm->reg != 0)
+	{
+		return itm->reg;
+	}
 	for(i = 8; i <= 25; i++)
 	{
 		if(reg_status[i] == 0)
 		{
+			itm->reg = i;
+			reg_status[i] = 1;
 			return i;
 		}
 	}
-	OperandsInBlock cur = list, min = list;
+	OperandsInBlock cur = list, min = NULL;
 	while(cur != NULL)
 	{
-		if(cur->remcnt < min->remcnt)
-			min = cur;
+		if(cur->reg != 0)
+		{
+			if(min == NULL)
+				min = cur;
+			else if(cur->remcnt <= min->remcnt)//= is for make the spilled one show up later.
+				min = cur;
+		}
 		if(min->remcnt == 0)
 			break;
+		cur = cur->next;
 	}
 	int result = min->reg;
 	spill(min);
+	min->reg = 0;
+	itm->reg = result;
 	return result;
+}
+
+void free_reg(OperandsInBlock itm, int* reg_status)
+{
+	itm->remcnt = 0;
+	reg_status[itm->reg] = 0;
+	itm->reg = 0;
+}
+
+void SelectOC(InterCodes* codes, int start, int end)
+{
+	int i;
+	OperandsInBlock list = OIBlistCreate(codes, start, end);
+	
+	int list_len = 0;
+	OperandsInBlock itr = list;
+	while(itr != NULL)
+	{
+		list_len++;
+		itr = itr->next;
+	} 
+	
+	
+	int reg_status[32] = {0};
+	for(i = start; i < end; i ++)
+	{
+		InterCode cur = &(codes[i]->code);
+		int right = 0, forleft = 0, right2 = 0;
+		OperandsInBlock rightitm, rightitm2;
+		IRPrint(stdout, codes[i]);
+		switch (codes[i]->code.kind)
+		{
+		case ASSIGN:
+			if(cur->u.assign.right->kind == CONSTANT)
+			{
+				forleft = allocate(cur->u.assign.left, list, reg_status); 
+				fprintf(global_stream, "li $%s, %i\n", reglist[forleft], cur->u.assign.right->u.value);
+			}
+			else 
+			{
+				right = ensure(cur->u.assign.right, list, reg_status);
+				rightitm = findOP(list,cur->u.assign.right);
+				if(rightitm->remcnt == 1)
+				{
+					free_reg(rightitm, reg_status);
+				}
+				else
+					rightitm->remcnt--;
+				
+				forleft = allocate(cur->u.assign.left, list, reg_status); 
+				if(forleft != 0)
+				{
+					fprintf(global_stream, "move $%s, $%s\n", reglist[forleft], reglist[right]);
+				}
+			}
+			break;
+		case STAR_ASSIGN_:
+			right = ensure(cur->u.assign.right, list, reg_status);
+			rightitm = findOP(list,cur->u.assign.right);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			else
+				rightitm->remcnt--;
+				
+			forleft = allocate(cur->u.assign.left, list, reg_status); 
+			if(forleft != 0)
+			{
+				fprintf(global_stream, "sw $%s, 0($%s)\n", reglist[right], reglist[forleft]);
+			}
+			break;
+		case _ASSIGN_AND:
+			right = ensure(cur->u.assign.right, list, reg_status);
+			rightitm = findOP(list,cur->u.assign.right);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			else
+				rightitm->remcnt--;
+				
+			forleft = allocate(cur->u.assign.left, list, reg_status); 
+			if(forleft != 0)
+			{
+				fprintf(global_stream, "la $%s, 0($%s)\n", reglist[forleft], reglist[right]);
+			}
+			break;
+		case _ASSIGN_STAR:
+			right = ensure(cur->u.assign.right, list, reg_status);
+			rightitm = findOP(list,cur->u.assign.right);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			else
+				rightitm->remcnt--;
+				
+			forleft = allocate(cur->u.assign.left, list, reg_status); 
+			if(forleft != 0)
+			{
+				fprintf(global_stream, "lw $%s, 0($%s)\n", reglist[forleft], reglist[right]);
+			}
+			break;
+		case ADD:
+		case ADDR_ADD_VAR:
+			right = ensure(cur->u.binop.op1, list, reg_status);
+			
+			if(cur->u.binop.op2->kind != CONSTANT)
+			{
+				right2 = ensure(cur->u.binop.op2, list, reg_status);
+			}
+			rightitm = findOP(list,cur->u.binop.op1);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			else
+				rightitm->remcnt--;
+			if(cur->u.binop.op2->kind != CONSTANT)
+			{
+				rightitm2  = findOP(list,cur->u.binop.op2);
+				if(rightitm2->remcnt == 1)
+				{
+					free_reg(rightitm2, reg_status);
+				}
+				else
+					rightitm2->remcnt--;	
+			}
+			forleft = allocate(cur->u.binop.result, list, reg_status); 
+			if( forleft != 0)
+			{
+				if(cur->u.binop.op2->kind != CONSTANT)
+					fprintf(global_stream, "add $%s, $%s, $%s\n", reglist[forleft], reglist[right], reglist[right2]);
+				else
+					fprintf(global_stream, "addi $%s, $%s, %i\n", reglist[forleft], reglist[right], cur->u.binop.op2->u.value);
+			}
+			break;
+		case SUB:
+			right = ensure(cur->u.binop.op1, list, reg_status);
+			if(cur->u.binop.op2->kind != CONSTANT)
+			{
+				right2 = ensure(cur->u.binop.op2, list, reg_status);
+			}
+			rightitm = findOP(list,cur->u.binop.op1);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			else
+				rightitm->remcnt--;
+			if(cur->u.binop.op2->kind != CONSTANT)
+			{
+				rightitm2  = findOP(list,cur->u.binop.op2);
+				if(rightitm2->remcnt == 1)
+				{
+					free_reg(rightitm2, reg_status);
+				}
+				else
+					rightitm2->remcnt--;	
+			}
+			forleft = allocate(cur->u.binop.result, list, reg_status); 
+			if( forleft != 0)
+			{
+				if(cur->u.binop.op2->kind != CONSTANT)
+					fprintf(global_stream, "sub $%s, $%s, $%s\n", reglist[forleft], reglist[right], reglist[right2]);
+				else
+					fprintf(global_stream, "addi $%s, $%s, -%i\n", reglist[forleft], reglist[right], cur->u.binop.op2->u.value);
+			}
+			break;
+		case MUL:
+			right = ensure(cur->u.binop.op1, list, reg_status);
+			right2 = ensure(cur->u.binop.op2, list, reg_status);
+			
+
+			rightitm = findOP(list,cur->u.binop.op1);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			else
+				rightitm->remcnt--;
+			rightitm2  = findOP(list,cur->u.binop.op2);
+			if(rightitm2->remcnt == 1)
+			{
+				free_reg(rightitm2, reg_status);
+			}
+			else
+				rightitm2->remcnt--;	
+			forleft = allocate(cur->u.binop.result, list, reg_status); 
+			
+			printf("right1: %i, right2:%i, forleft:%i\n", right, right2, forleft);
+			if( forleft != 0)
+			{
+				fprintf(global_stream, "mul $%s, $%s, $%s\n", reglist[forleft], reglist[right], reglist[right2]);
+			}
+			break;
+		case DIVIDE:
+			right = ensure(cur->u.binop.op1, list, reg_status);
+			right2 = ensure(cur->u.binop.op2, list, reg_status);
+
+			rightitm = findOP(list,cur->u.binop.op1);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			else
+				rightitm->remcnt--;
+			rightitm2  = findOP(list,cur->u.binop.op2);
+			if(rightitm2->remcnt == 1)
+			{
+				free_reg(rightitm2, reg_status);
+			}
+			else
+				rightitm2->remcnt--;	
+			forleft = allocate(cur->u.binop.result, list, reg_status); 
+			if( forleft != 0)
+			{
+				fprintf(global_stream, "div $%s, $%s\n",reglist[right], reglist[right2]);
+				fprintf(global_stream, "mflo $%s\n",reglist[forleft]);
+			}
+			break;
+		case LABEL:
+			fprintf(global_stream, "label%i:\n", cur->u.label.label_no);
+			break;
+		case IFGOTO:
+			right = ensure(cur->u.condjmp.op1, list, reg_status);
+			right2 = ensure(cur->u.condjmp.op2, list, reg_status);
+
+			rightitm = findOP(list,cur->u.condjmp.op1);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			else
+				rightitm->remcnt--;
+			rightitm2  = findOP(list,cur->u.condjmp.op2);
+			if(rightitm2->remcnt == 1)
+			{
+				free_reg(rightitm2, reg_status);
+			}
+			else
+				rightitm2->remcnt--;
+			int rel = cur->u.condjmp.rel->u.rel;
+			switch(rel)
+			{
+			case LEQ: fprintf(global_stream, "ble $%s, $%s, label%i\n", reglist[right], reglist[right2], cur->u.condjmp.dest_label);break;
+			case L: fprintf(global_stream, "blt $%s, $%s, label%i\n", reglist[right], reglist[right2], cur->u.condjmp.dest_label);break;
+			case GEQ: fprintf(global_stream, "bge $%s, $%s, label%i\n", reglist[right], reglist[right2], cur->u.condjmp.dest_label);break;
+			case G: fprintf(global_stream, "bgt $%s, $%s, label%i\n", reglist[right], reglist[right2], cur->u.condjmp.dest_label);break;
+			case EQ: fprintf(global_stream, "beq $%s, $%s, label%i\n", reglist[right], reglist[right2], cur->u.condjmp.dest_label);break;
+			case NEQ:fprintf(global_stream, "bne $%s, $%s, label%i\n", reglist[right], reglist[right2], cur->u.condjmp.dest_label);break;
+			}
+			break;
+		case GOTO:
+			fprintf(global_stream, "j label%i\n", cur->u.jmp.dest_label);
+			break;
+		case READ:
+			forleft = allocate(cur->u.single.op, list, reg_status); 
+			fprintf(global_stream, "addi $sp, $sp, -4\nsw $ra, 0($sp)\njal read\nlw $ra, 0($sp)\naddi $sp, $sp, 4\nmove $%s, $v0\n", reglist[forleft]);
+			break;
+		case WRITE:
+			right = ensure(cur->u.single.op, list, reg_status);
+			rightitm = findOP(list,cur->u.single.op);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			fprintf(global_stream, "move $a0, $%s\naddi $sp, $sp, -4\nsw $ra, 0($sp)\njal write\nlw $ra, 0($sp)\naddi $sp, $sp, 4\n", reglist[right]);
+			break;
+		case CALL:
+			break;
+		case ARG:
+			break;
+		case RET:
+			right = ensure(cur->u.single.op, list, reg_status);
+			rightitm = findOP(list,cur->u.single.op);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			fprintf(global_stream, "move $v0, $%s\nmove $sp, $fp\nlw $fp, 0($sp)\naddi $sp, $sp, 4\njr $ra\n", reglist[right]);
+			break;
+		case FUNCDEC:
+			fprintf(global_stream, "%s:\n", cur->u.single.op->u.var_name);
+			fprintf(global_stream, "addi $sp, $sp, -4\nsw $fp, 0($sp)\nmove $fp, $sp\n");
+			curfpoff = 4;
+			fprintf(global_stream, "addi $sp, $sp, -%i\n", list_len*4);
+			break;
+		case PARAM:
+			break;
+		case DEC: 
+			get_place_for_array(cur->u.dec.var, cur->u.dec.size);
+			break;
+		}
+		//spill all to stack
+	}
+	/*
+	itr = list;
+	while(itr != NULL)
+	{
+		if(itr->reg != 0&&(itr->op->kind == VARI || itr->op->kind == ADDRESS ||itr->op->kind == TEMP ||itr->op->kind == TEMPADDRESS))
+		{
+			spill(itr);
+		}
+		itr = itr->next;
+	}*/
 }
 
 /*
@@ -230,136 +751,4 @@ int free_reg(Operand op, OperandsInBlock list, int* reg_status, InterCodes* code
 		cur = cur->next;
 	}
 }*/
-
-void SelectOC(InterCodes* codes, int start, int end)
-{
-	curfpoff = 0;
-	int i;
-	OperandsInBlock list = OIBlistCreate(codes, start, end);
-	int reg_status[32] = {0};
-	for(i = start; i < end; i ++)
-	{
-		InterCode cur = &(codes[i]->code);
-		switch (codes[i]->code.kind)
-		{
-		case ASSIGN:
-			if(cur->u.assign.right->kind == CONSTANT)
-			{
-				int forleft = allocate(list, reg_status); 
-				fprintf(global_stream, "li $%s, %i", reglist[forleft], cur->u.assign.right->u.value);
-			}
-			else 
-			{
-				;
-			}
-			break;
-		case STAR_ASSIGN_:
-			break;
-		case _ASSIGN_AND:
-			break;
-		case _ASSIGN_STAR:
-			break;
-		case ADD:
-			
-			break;
-		case ADDR_ADD_VAR:
-			OperandPrint(stream, cur->code.u.binop.result);
-			fprintf(stream, " := ");
-			fprintf(stream, "&");
-			OperandPrint(stream, cur->code.u.binop.op1);
-			fprintf(stream, " + ");
-			OperandPrint(stream, cur->code.u.binop.op2);
-			fputc('\n', stream);
-			break;
-		case SUB:
-			OperandPrint(stream, cur->code.u.binop.result);
-			fprintf(stream, " := ");
-			OperandPrint(stream, cur->code.u.binop.op1);
-			fprintf(stream, " - ");
-			OperandPrint(stream, cur->code.u.binop.op2);
-			fputc('\n', stream);
-			break;
-		case MUL:
-			OperandPrint(stream, cur->code.u.binop.result);
-			fprintf(stream, " := ");
-			OperandPrint(stream, cur->code.u.binop.op1);
-			fprintf(stream, " * ");
-			OperandPrint(stream, cur->code.u.binop.op2);
-			fputc('\n', stream);
-			break;
-		case DIVIDE:
-			OperandPrint(stream, cur->code.u.binop.result);
-			fprintf(stream, " := ");
-			OperandPrint(stream, cur->code.u.binop.op1);
-			fprintf(stream, " / ");
-			OperandPrint(stream, cur->code.u.binop.op2);
-			fputc('\n', stream);
-			break;
-		case LABEL:
-			fprintf(stream, "LABEL label%i :\n", cur->code.u.label.label_no);
-			break;
-		case IFGOTO:
-			fprintf(stream, "IF ");
-			OperandPrint(stream, cur->code.u.condjmp.op1);
-			fputc(' ', stream);
-			OperandPrint(stream, cur->code.u.condjmp.rel);
-			fputc(' ', stream);
-			OperandPrint(stream, cur->code.u.condjmp.op2);
-			fprintf(stream, " GOTO label%i\n", cur->code.u.condjmp.dest_label);
-			break;
-		case GOTO:
-			fprintf(stream, "GOTO label%i\n", cur->code.u.jmp.dest_label);
-			break;
-		case READ:
-			fprintf(stream, "READ ");
-			OperandPrint(stream, cur->code.u.single.op);
-			fputc('\n', stream);
-			break;
-		case WRITE:
-			fprintf(stream, "WRITE ");
-			OperandPrint(stream, cur->code.u.single.op);
-			fputc('\n', stream);
-			break;
-		case CALL:
-			if(cur->code.u.assign.left != NULL)
-			{
-				OperandPrint(stream, cur->code.u.assign.left);
-				fprintf(stream, " := ");
-			}
-			else
-			{
-				fprintf(stream, "NOONE := ");
-			}
-			fprintf(stream, "CALL ");
-			OperandPrint(stream, cur->code.u.assign.right);
-			fputc('\n', stream);
-			break;
-		case ARG:
-			fprintf(stream, "ARG ");
-			OperandPrint(stream, cur->code.u.single.op);
-			fputc('\n', stream);
-			break;
-		case RET:
-			fprintf(stream, "RETURN ");
-			OperandPrint(stream, cur->code.u.single.op);
-			fputc('\n', stream);
-			break;
-		case FUNCDEC:
-			fprintf(stream, "FUNCTION ");
-			OperandPrint(stream, cur->code.u.single.op);
-			fprintf(stream, " :\n");
-			break;
-		case PARAM:
-			fprintf(stream, "PARAM ");
-			OperandPrint(stream, cur->code.u.single.op);
-			fputc('\n', stream);
-			break;
-		case DEC: 
-			fprintf(stream, "DEC ");
-			OperandPrint(stream, cur->code.u.dec.var);
-			fprintf(stream, " %i\n", cur->code.u.dec.size);
-		}
-	}
-}
-
 

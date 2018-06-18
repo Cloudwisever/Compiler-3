@@ -1,0 +1,19 @@
+FUNCTION main :
+t1 := #1
+VAR_x := t1
+t2 := #2
+VAR_y := t2
+t4 := VAR_x
+t5 := VAR_y
+t3 := t4 + t5
+VAR_z := t3
+t7 := VAR_y
+t8 := #4
+t6 := t7 * t8
+VAR_z := t6
+t10 := VAR_z
+t11 := #2
+t9 := t10 / t11
+VAR_z := t9
+t12 := VAR_z
+RETURN t12

@@ -37,10 +37,10 @@ struct InterCode_
 	enum {ASSIGN, STAR_ASSIGN_STAR, STAR_ASSIGN_, _ASSIGN_AND, _ASSIGN_STAR, ADD, ADDR_ADD_VAR, SUB, MUL, DIVIDE, LABEL, IFGOTO, GOTO, READ, WRITE, CALL, ARG, RET, FUNCDEC, PARAM, DEC} kind;
 	union
 	{
-		struct { Operand right, left; }assign;
+		struct { Operand left, right; }assign;
 		struct { Operand result, op1, op2; }binop;
 		struct { int label_no;}label;
-		struct { Operand op1, rel, op2; int dest_label;}condjmp;
+		struct { Operand rel, op1, op2; int dest_label;}condjmp;
 		struct { int dest_label;}jmp;
 		struct { Operand op;}single;
 		struct { Operand var; int size;}dec;
