@@ -23,12 +23,20 @@ addi $sp, $sp, -4
 sw $fp, 0($sp)
 move $fp, $sp
 addi $sp, $sp, -260
+addi $sp, $sp, -20
 li $t0, 0
 move $t1, $t0
+sw $t0, -28($fp)
+sw $t1, -32($fp)
 label1:
-move $t2, $t1
-li $t3, 5
-blt $t2, $t3, label2
+lw $t0, -32($fp)
+move $t0, $t0
+li $t1, 5
+sw $t0, -36($fp)
+sw $t1, -40($fp)
+lw $t0, -36($fp)
+lw $t1, -40($fp)
+blt $t0, $t1, label2
 j label3
 label2:
 addi $sp, $sp, -4
@@ -36,156 +44,197 @@ sw $ra, 0($sp)
 jal read
 lw $ra, 0($sp)
 addi $sp, $sp, 4
-move $t4, $v0
+move $t0, $v0
+lw $t1, -32($fp)
+move $t2, $t1
+li $t3, 4
+mul $t2, $t2, $t3
+la $t3, -24($fp)
+add $t3, $t3, $t2
+move $t4, $t3
+sw $t0, 0($t4)
 move $t5, $t1
-li $t6, 4
-mul $t5, $t5, $t6
-la $t7, -24($fp)
-add $s0, $t7, $t5
-move $s1, $s0
-sw $t4, 0($s1)
-move $s2, $t1
-li $s3, 1
-add $s4, $s2, $s3
-move $t1, $s4
+li $t6, 1
+add $t7, $t5, $t6
+move $t1, $t7
+sw $t0, -44($fp)
+sw $t2, -48($fp)
+sw $t1, -32($fp)
+sw $t3, -52($fp)
+sw $t4, -56($fp)
+sw $t5, -60($fp)
+sw $t6, -64($fp)
+sw $t7, -68($fp)
 j label1
 label3:
-li $s5, 1
-move $t1, $s5
+li $t0, 1
+move $t1, $t0
+sw $t0, -72($fp)
+sw $t1, -32($fp)
 label4:
-move $s6, $t1
-li $s7, 5
-blt $s6, $s7, label5
+lw $t0, -32($fp)
+move $t0, $t0
+li $t1, 5
+sw $t0, -76($fp)
+sw $t1, -80($fp)
+lw $t0, -76($fp)
+lw $t1, -80($fp)
+blt $t0, $t1, label5
 j label6
 label5:
-move $t8, $t1
-move $t9, $t8
+lw $t0, -32($fp)
+move $t0, $t0
+move $t1, $t0
+sw $t0, -84($fp)
+sw $t1, -88($fp)
 label7:
-sw $t8, -28($fp)
-move $t8, $t9
-sw $s7, -32($fp)
-li $s7, 0
-bgt $t8, $s7, label10
+lw $t0, -88($fp)
+move $t0, $t0
+li $t1, 0
+sw $t0, -92($fp)
+sw $t1, -96($fp)
+lw $t0, -92($fp)
+lw $t1, -96($fp)
+bgt $t0, $t1, label10
 j label9
 label10:
-sw $s7, -36($fp)
-move $s7, $t9
-sw $t8, -40($fp)
-li $t8, 1
-sw $t8, -44($fp)
-sub $t8, $s7, $t8
-mul $t8, $t8, $t6
-sw $s7, -48($fp)
-add $s7, $t7, $t8
-sw $s7, -52($fp)
-lw $s7, 0($s7)
-sw $s6, -56($fp)
-move $s6, $t9
-mul $s6, $s6, $t6
-sw $s5, -60($fp)
-add $s5, $t7, $s6
-sw $s5, -64($fp)
-lw $s5, 0($s5)
-bgt $s7, $s5, label8
+lw $t0, -88($fp)
+move $t1, $t0
+li $t2, 1
+sub $t3, $t1, $t2
+li $t4, 4
+mul $t3, $t3, $t4
+la $t5, -24($fp)
+add $t6, $t5, $t3
+lw $t7, 0($t6)
+move $t0, $t0
+mul $t0, $t0, $t4
+add $t4, $t5, $t0
+lw $t5, 0($t4)
+sw $t1, -100($fp)
+sw $t2, -104($fp)
+sw $t3, -108($fp)
+sw $t6, -112($fp)
+sw $t7, -116($fp)
+sw $t0, -120($fp)
+sw $t4, -124($fp)
+sw $t5, -128($fp)
+lw $t0, -116($fp)
+lw $t1, -128($fp)
+bgt $t0, $t1, label8
 j label9
 label8:
-sw $s5, -68($fp)
-move $s5, $t9
-mul $s5, $s5, $t6
-sw $s7, -72($fp)
-add $s7, $t7, $s5
-sw $s7, -76($fp)
-lw $s7, 0($s7)
-sw $s7, -80($fp)
-move $s7, $s7
-sw $s4, -84($fp)
-move $s4, $t9
-sw $s3, -88($fp)
-li $s3, 1
-sw $s3, -92($fp)
-sub $s3, $s4, $s3
-mul $s3, $s3, $t6
-sw $s4, -96($fp)
-add $s4, $t7, $s3
-sw $s4, -100($fp)
-lw $s4, 0($s4)
-sw $s2, -104($fp)
-move $s2, $t9
-mul $s2, $s2, $t6
-sw $s0, -108($fp)
-add $s0, $t7, $s2
-sw $s0, -112($fp)
-move $s0, $s0
-sw $s4, 0($s0)
-sw $s4, -116($fp)
-move $s4, $s7
-sw $s7, -120($fp)
-move $s7, $t9
-sw $t4, -124($fp)
-li $t4, 1
-sw $t4, -128($fp)
-sub $t4, $s7, $t4
-mul $t4, $t4, $t6
-sw $s7, -132($fp)
-add $s7, $t7, $t4
-sw $s7, -136($fp)
-move $s7, $s7
-sw $s4, 0($s7)
-sw $s4, -140($fp)
-move $s4, $t9
-sw $t7, -0($fp)
-li $t7, 1
-sw $t7, -144($fp)
-sub $t7, $s4, $t7
-move $t9, $t7
+lw $t0, -88($fp)
+move $t1, $t0
+li $t2, 4
+mul $t1, $t1, $t2
+la $t3, -24($fp)
+add $t4, $t3, $t1
+lw $t5, 0($t4)
+move $t6, $t5
+move $t7, $t0
+li $s0, 1
+sub $s1, $t7, $s0
+mul $s1, $s1, $t2
+add $s2, $t3, $s1
+lw $s3, 0($s2)
+move $s4, $t0
+mul $s4, $s4, $t2
+add $s5, $t3, $s4
+move $s6, $s5
+sw $s3, 0($s6)
+move $s7, $t6
+move $t8, $t0
+li $t9, 1
+sw $t9, -132($fp)
+sub $t9, $t8, $t9
+mul $t9, $t9, $t2
+add $t2, $t3, $t9
+move $t3, $t2
+sw $s7, 0($t3)
+sw $t2, -136($fp)
+move $t2, $t0
+sw $t8, -140($fp)
+li $t8, 1
+sw $t8, -144($fp)
+sub $t8, $t2, $t8
+move $t0, $t8
+sw $t1, -148($fp)
+sw $t0, -88($fp)
+sw $t4, -152($fp)
+sw $t5, -156($fp)
+sw $t6, -160($fp)
+sw $t7, -164($fp)
+sw $s0, -168($fp)
+sw $s1, -172($fp)
+sw $s2, -176($fp)
+sw $s3, -180($fp)
+sw $s4, -184($fp)
+sw $s5, -188($fp)
+sw $s6, -192($fp)
+sw $s7, -196($fp)
+sw $t9, -200($fp)
+sw $t3, -204($fp)
+sw $t2, -208($fp)
+sw $t8, -212($fp)
 j label7
 label9:
-sw $t7, -148($fp)
-move $t7, $t1
-sw $s4, -152($fp)
-li $s4, 1
-sw $s4, -156($fp)
-add $s4, $t7, $s4
-move $t1, $s4
+lw $t0, -32($fp)
+move $t1, $t0
+li $t2, 1
+add $t3, $t1, $t2
+move $t0, $t3
+sw $t1, -216($fp)
+sw $t0, -32($fp)
+sw $t2, -220($fp)
+sw $t3, -224($fp)
 j label4
 label6:
-sw $s4, -160($fp)
-li $s4, 0
-move $t1, $s4
+li $t0, 0
+move $t1, $t0
+sw $t0, -228($fp)
+sw $t1, -32($fp)
 label11:
-sw $s4, -164($fp)
-move $s4, $t1
-sw $t7, -168($fp)
-li $t7, 5
-blt $s4, $t7, label12
+lw $t0, -32($fp)
+move $t0, $t0
+li $t1, 5
+sw $t0, -232($fp)
+sw $t1, -236($fp)
+lw $t0, -232($fp)
+lw $t1, -236($fp)
+blt $t0, $t1, label12
 j label13
 label12:
-sw $t7, -172($fp)
-move $t7, $t1
-mul $t7, $t7, $t6
-la $t6, -24($fp)
-add $t6, $t6, $t7
-sw $t6, -176($fp)
-lw $t6, 0($t6)
-move $a0, $t6
+lw $t0, -32($fp)
+move $t1, $t0
+li $t2, 4
+mul $t1, $t1, $t2
+la $t2, -24($fp)
+add $t2, $t2, $t1
+lw $t3, 0($t2)
+move $a0, $t3
 addi $sp, $sp, -4
 sw $ra, 0($sp)
 jal write
 lw $ra, 0($sp)
 addi $sp, $sp, 4
-sw $s4, -180($fp)
-move $s4, $t1
-sw $t3, -184($fp)
-li $t3, 1
-sw $t3, -188($fp)
-add $t3, $s4, $t3
-move $t1, $t3
+move $t4, $t0
+li $t5, 1
+add $t6, $t4, $t5
+move $t0, $t6
+sw $t1, -240($fp)
+sw $t0, -32($fp)
+sw $t2, -244($fp)
+sw $t3, -248($fp)
+sw $t4, -252($fp)
+sw $t5, -256($fp)
+sw $t6, -260($fp)
 j label11
 label13:
-sw $t3, -192($fp)
-li $t3, 0
-move $v0, $t3
+li $t0, 0
+move $v0, $t0
 move $sp, $fp
 lw $fp, 0($sp)
 addi $sp, $sp, 4
 jr $ra
+sw $t0, -264($fp)

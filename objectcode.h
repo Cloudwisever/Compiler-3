@@ -42,6 +42,6 @@ OperandsInBlock OIBlistCreate(InterCodes* codes, int start, int end);
 OperandsInBlock addOIBlist(OperandsInBlock tail,  Operand op);
 int allocate(Operand op,OperandsInBlock list, int* reg_status);
 int ensure(Operand op, OperandsInBlock list, int*reg_status);
-void SelectOC(InterCodes* codes, int start, int end);
+void SelectOC(InterCodes* codes, int start, int end, int length);
 
 #endif

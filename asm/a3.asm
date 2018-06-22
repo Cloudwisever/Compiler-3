@@ -44,80 +44,118 @@ div $t5, $t6
 mflo $t7
 li $s0, 2
 mul $s1, $t7, $s0
-beq $t4, $s1, label1
+sw $t0, -8($fp)
+sw $t1, -12($fp)
+sw $t2, -16($fp)
+sw $t3, -20($fp)
+sw $t4, -24($fp)
+sw $t5, -28($fp)
+sw $t6, -32($fp)
+sw $t7, -36($fp)
+sw $s0, -40($fp)
+sw $s1, -44($fp)
+lw $t0, -24($fp)
+lw $t1, -44($fp)
+beq $t0, $t1, label1
 j label2
 label1:
-li $s2, 1
-move $s3, $s2
+li $t0, 1
+move $t1, $t0
+sw $t0, -48($fp)
+sw $t1, -52($fp)
 j label3
 label2:
-move $s4, $t1
-move $s3, $s4
+lw $t0, -12($fp)
+move $t0, $t0
+move $t1, $t0
+sw $t0, -56($fp)
+sw $t1, -52($fp)
 label3:
-move $s5, $t3
-li $s6, 2
-div $s5, $s6
-mflo $s7
-move $t3, $s7
+lw $t0, -20($fp)
+move $t1, $t0
+li $t2, 2
+div $t1, $t2
+mflo $t3
+move $t0, $t3
+sw $t1, -60($fp)
+sw $t0, -20($fp)
+sw $t2, -64($fp)
+sw $t3, -68($fp)
 label4:
-move $t8, $t3
-li $t9, 0
-bgt $t8, $t9, label5
+lw $t0, -20($fp)
+move $t0, $t0
+li $t1, 0
+sw $t0, -72($fp)
+sw $t1, -76($fp)
+lw $t0, -72($fp)
+lw $t1, -76($fp)
+bgt $t0, $t1, label5
 j label6
 label5:
-sw $t9, -8($fp)
-move $t9, $t1
-sw $t8, -12($fp)
-move $t8, $t1
-sw $t8, -16($fp)
-mul $t8, $t9, $t8
-move $t1, $t8
-sw $t8, -20($fp)
-move $t8, $t3
-sw $t9, -24($fp)
-move $t9, $t3
-sw $s7, -28($fp)
-li $s7, 2
-sw $s7, -32($fp)
-div $t9, $s7
-mflo $s7
-sw $t9, -36($fp)
-li $t9, 2
-sw $t9, -40($fp)
-mul $t9, $s7, $t9
-bne $t8, $t9, label7
+lw $t0, -12($fp)
+move $t1, $t0
+move $t2, $t0
+mul $t3, $t1, $t2
+move $t0, $t3
+lw $t4, -20($fp)
+move $t5, $t4
+move $t4, $t4
+li $t6, 2
+div $t4, $t6
+mflo $t7
+li $s0, 2
+mul $s1, $t7, $s0
+sw $t1, -80($fp)
+sw $t0, -12($fp)
+sw $t2, -84($fp)
+sw $t3, -88($fp)
+sw $t5, -92($fp)
+sw $t4, -96($fp)
+sw $t6, -100($fp)
+sw $t7, -104($fp)
+sw $s0, -108($fp)
+sw $s1, -112($fp)
+lw $t0, -92($fp)
+lw $t1, -112($fp)
+bne $t0, $t1, label7
 j label8
 label7:
-sw $t9, -44($fp)
-move $t9, $s3
-sw $s7, -48($fp)
-move $s7, $t1
-sw $s7, -52($fp)
-mul $s7, $t9, $s7
-move $s3, $s7
+lw $t0, -52($fp)
+move $t1, $t0
+lw $t2, -12($fp)
+move $t2, $t2
+mul $t3, $t1, $t2
+move $t0, $t3
+sw $t1, -116($fp)
+sw $t0, -52($fp)
+sw $t2, -120($fp)
+sw $t3, -124($fp)
 label8:
-sw $s7, -56($fp)
-move $s7, $t3
-sw $t9, -60($fp)
-li $t9, 2
-sw $t9, -64($fp)
-div $s7, $t9
-mflo $t9
-move $t3, $t9
+lw $t0, -20($fp)
+move $t1, $t0
+li $t2, 2
+div $t1, $t2
+mflo $t3
+move $t0, $t3
+sw $t1, -128($fp)
+sw $t0, -20($fp)
+sw $t2, -132($fp)
+sw $t3, -136($fp)
 j label4
 label6:
-sw $t9, -68($fp)
-move $t9, $s3
-move $a0, $t9
+lw $t0, -52($fp)
+move $t0, $t0
+move $a0, $t0
 addi $sp, $sp, -4
 sw $ra, 0($sp)
 jal write
 lw $ra, 0($sp)
 addi $sp, $sp, 4
-sw $s7, -72($fp)
-li $s7, 0
-move $v0, $s7
+li $t1, 0
+move $v0, $t1
 move $sp, $fp
 lw $fp, 0($sp)
 addi $sp, $sp, 4
 jr $ra
+sw $t0, -140($fp)
+sw $t1, -144($fp)

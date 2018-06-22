@@ -1,0 +1,22 @@
+int swap(int a,int b, int c, int d, int e) {
+int tem = a;
+a = b;
+b = tem;
+write(a);
+write(b);
+return e;
+}
+int main() {
+int x[5];
+int i = 0;
+int rr;
+while(i < 5) {
+x[i] = read();
+if(i > 0) {
+rr = swap(x[i-1],x[i], 0, 1, i);
+write(rr);
+}
+i = i + 1;
+}
+return 0;
+}

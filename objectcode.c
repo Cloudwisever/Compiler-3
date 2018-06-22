@@ -66,21 +66,29 @@ void GenerateObjectCode(InterCodes ircodes)
 	if(global_stream != stdout)
 		PrintProgramHead(global_stream);
 	
-	printf("creating positionlist\n");
+	//printf("creating positionlist\n");
 	position_list = OIBlistCreate(blocks.code, 0, blocks.length);
-	printf("creatation complete.\n");
+	//printf("creatation complete.\n");
 	
 	curfpoff = 4;
-	SelectOC(blocks.code, 0, blocks.length);
-	/*
+	//SelectOC(blocks.code, 0, blocks.length);
+	
+	OperandsInBlock itr = position_list;
+	int list_len = 0;
+	while(itr != NULL)
+	{
+		list_len++;
+		itr = itr->next;
+	} 
+	
+
+
 	for(hdi = 0; hdi < blocks.leader_length; hdi++)
 	{
-		curfpoff = 4;
 		if(hdi == blocks.leader_length-1)
-			SelectOC(blocks.code, blocks.leader[hdi], blocks.length);
-		SelectOC(blocks.code, blocks.leader[hdi], blocks.leader[hdi+1]);
+			SelectOC(blocks.code, blocks.leader[hdi], blocks.length, list_len);
+		SelectOC(blocks.code, blocks.leader[hdi], blocks.leader[hdi+1], list_len);
 	}
-	*/
 }
 OperandsInBlock addOIBlist(OperandsInBlock tail,  Operand op)
 {
@@ -105,10 +113,10 @@ OperandsInBlock OIBlistCreate(InterCodes* codes, int start, int end)
 	memset(head, 0, sizeof(struct OperandsInBlock_));
 	tail = head;
 	
-	printf("start: %i. end:%i\n", start, end);
+	//printf("start: %i. end:%i\n", start, end);
 	for(i = start; i <  end; i++)
 	{
-		IRPrint(stdout, codes[i]);
+		//IRPrint(stdout, codes[i]);
 		/*
 		if(codes[i]->code.kind == LABEL || codes[i]->code.kind == GOTO)
 			continue;
@@ -165,7 +173,7 @@ OperandsInBlock OIBlistCreate(InterCodes* codes, int start, int end)
 		}
 		*/
 		
-		if(codes[i]->code.kind >= ASSIGN&&codes[i]->code.kind <= DIVIDE)
+		if(codes[i]->code.kind >= ASSIGN&&codes[i]->code.kind <= DIVIDE||codes[i]->code.kind == CALL)
 		{
 			if(codes[i]->code.u.single.op != NULL)
 			{
@@ -189,7 +197,7 @@ OperandsInBlock OIBlistCreate(InterCodes* codes, int start, int end)
 					findOP(head->next, codes[i]->code.u.binop.op2)->remcnt++;
 			}
 		}
-		else if(codes[i]->code.kind == READ||codes[i]->code.kind == WRITE || codes[i]->code.kind == RET)
+		else if(codes[i]->code.kind == READ||codes[i]->code.kind == WRITE || codes[i]->code.kind == RET||codes[i]->code.kind == DEC||codes[i]->code.kind == ARG || codes[i]->code.kind == PARAM)
 		{
 			if(codes[i]->code.u.single.op != NULL)
 			{
@@ -218,7 +226,7 @@ OperandsInBlock OIBlistCreate(InterCodes* codes, int start, int end)
 		}
 		
 	}
-	printf("created.\n");
+	//printf("created.\n");
 	return head->next;
 }
 
@@ -337,7 +345,7 @@ int ensure(Operand op, OperandsInBlock list, int*reg_status)
 	}
 }
 
-void spill(OperandsInBlock itm)
+void spill(OperandsInBlock itm, int* reg_status)
 {
 	OperandsInBlock positm = findOP(position_list, itm->op);
 	if(positm == NULL)
@@ -346,17 +354,23 @@ void spill(OperandsInBlock itm)
 		return;
 	}
 	else{
+		//printf("spilling :op is:");
+		//OperandPrint(stdout, itm->op);
+		//printf("\n");
 		if(positm->pos == 0)
 		{
 			positm->pos = curfpoff+4;
 			itm->pos = curfpoff+4;
 			curfpoff += 4;
-			fprintf(global_stream, "sw $%s, -%i($fp)\n", reglist[itm->reg], itm->pos);
+			//printf("the positm is new, adding sw %i\n", positm->pos
+			fprintf(global_stream, "sw $%s, -%i($fp)\n", reglist[itm->reg], positm->pos);
 		}
 		else
 		{
-			fprintf(global_stream, "sw $%s, -%i($fp)\n", reglist[itm->reg], itm->pos);
+			fprintf(global_stream, "sw $%s, -%i($fp)\n", reglist[itm->reg], positm->pos);
 		}
+		reg_status[itm->reg] = 0;
+		itm->reg = 0;
 	}
 }
 
@@ -394,6 +408,7 @@ int allocate(Operand op, OperandsInBlock list, int* reg_status)
 	OperandsInBlock cur = list, min = NULL;
 	while(cur != NULL)
 	{
+	
 		if(cur->reg != 0)
 		{
 			if(min == NULL)
@@ -401,13 +416,18 @@ int allocate(Operand op, OperandsInBlock list, int* reg_status)
 			else if(cur->remcnt <= min->remcnt)//= is for make the spilled one show up later.
 				min = cur;
 		}
-		if(min->remcnt == 0)
+		if(min != NULL && min->remcnt == 0)
 			break;
 		cur = cur->next;
 	}
+	if(min == NULL)
+	{
+		printf("why min is null?\n");
+		return 0;
+	}
 	int result = min->reg;
-	spill(min);
-	min->reg = 0;
+	spill(min, reg_status);
+	reg_status[result] = 1;
 	itm->reg = result;
 	return result;
 }
@@ -419,20 +439,23 @@ void free_reg(OperandsInBlock itm, int* reg_status)
 	itm->reg = 0;
 }
 
-void SelectOC(InterCodes* codes, int start, int end)
+void SelectOC(InterCodes* codes, int start, int end, int length)
 {
-	int i;
+	int i, spilled = 0;
 	OperandsInBlock list = OIBlistCreate(codes, start, end);
 	
-	int list_len = 0;
+	int list_len = length;
 	OperandsInBlock itr = list;
+	/*
 	while(itr != NULL)
 	{
 		list_len++;
 		itr = itr->next;
 	} 
+	*/
 	
-	
+	printf("selecting a new part: from %i to %i.\n", start, end);
+	int argscnt = 0, paramcnt = 0, idx;
 	int reg_status[32] = {0};
 	for(i = start; i < end; i ++)
 	{
@@ -440,6 +463,8 @@ void SelectOC(InterCodes* codes, int start, int end)
 		int right = 0, forleft = 0, right2 = 0;
 		OperandsInBlock rightitm, rightitm2;
 		IRPrint(stdout, codes[i]);
+
+		
 		switch (codes[i]->code.kind)
 		{
 		case ASSIGN:
@@ -450,8 +475,10 @@ void SelectOC(InterCodes* codes, int start, int end)
 			}
 			else 
 			{
+				//printf("ensuring\n");
 				right = ensure(cur->u.assign.right, list, reg_status);
 				rightitm = findOP(list,cur->u.assign.right);
+				//printf("ensured\n");
 				if(rightitm->remcnt == 1)
 				{
 					free_reg(rightitm, reg_status);
@@ -460,10 +487,13 @@ void SelectOC(InterCodes* codes, int start, int end)
 					rightitm->remcnt--;
 				
 				forleft = allocate(cur->u.assign.left, list, reg_status); 
-				if(forleft != 0)
+				
+				if(forleft == 0)
 				{
-					fprintf(global_stream, "move $%s, $%s\n", reglist[forleft], reglist[right]);
+					printf("forleft is zero:\n");
 				}
+				//printf("forleft is %i\n", forleft);
+				fprintf(global_stream, "move $%s, $%s\n", reglist[forleft], reglist[right]);
 			}
 			break;
 		case STAR_ASSIGN_:
@@ -601,7 +631,7 @@ void SelectOC(InterCodes* codes, int start, int end)
 				rightitm2->remcnt--;	
 			forleft = allocate(cur->u.binop.result, list, reg_status); 
 			
-			printf("right1: %i, right2:%i, forleft:%i\n", right, right2, forleft);
+			//printf("right1: %i, right2:%i, forleft:%i\n", right, right2, forleft);
 			if( forleft != 0)
 			{
 				fprintf(global_stream, "mul $%s, $%s, $%s\n", reglist[forleft], reglist[right], reglist[right2]);
@@ -633,9 +663,21 @@ void SelectOC(InterCodes* codes, int start, int end)
 			}
 			break;
 		case LABEL:
+			
 			fprintf(global_stream, "label%i:\n", cur->u.label.label_no);
 			break;
 		case IFGOTO:
+			itr = list;
+			while(itr != NULL)
+			{
+				if(itr->reg != 0&&(itr->op->kind == VARI || itr->op->kind == ADDRESS ||itr->op->kind == TEMP ||itr->op->kind == TEMPADDRESS))
+				{
+					spill(itr,reg_status);
+				}
+				itr = itr->next;
+			}
+			spilled = 1;
+	
 			right = ensure(cur->u.condjmp.op1, list, reg_status);
 			right2 = ensure(cur->u.condjmp.op2, list, reg_status);
 
@@ -665,6 +707,18 @@ void SelectOC(InterCodes* codes, int start, int end)
 			}
 			break;
 		case GOTO:
+			if(i == end - 1)
+			{
+				itr = list;
+				while(itr != NULL)
+				{
+					if(itr->reg != 0&&(itr->op->kind == VARI || itr->op->kind == ADDRESS ||itr->op->kind == TEMP ||itr->op->kind == TEMPADDRESS))
+					{
+						spill(itr,reg_status);
+					}
+					itr = itr->next;
+				}
+			}
 			fprintf(global_stream, "j label%i\n", cur->u.jmp.dest_label);
 			break;
 		case READ:
@@ -681,8 +735,47 @@ void SelectOC(InterCodes* codes, int start, int end)
 			fprintf(global_stream, "move $a0, $%s\naddi $sp, $sp, -4\nsw $ra, 0($sp)\njal write\nlw $ra, 0($sp)\naddi $sp, $sp, 4\n", reglist[right]);
 			break;
 		case CALL:
+			itr = list;
+			while(itr != NULL)
+			{
+				if(itr->reg != 0&&(itr->op->kind == VARI || itr->op->kind == ADDRESS ||itr->op->kind == TEMP ||itr->op->kind == TEMPADDRESS))
+				{
+					spill(itr,reg_status);
+				}
+				itr = itr->next;
+			}
+			
+			fprintf(global_stream, "addi $sp, $sp, -4\nsw $ra, 0($sp)\njal %s\n", cur->u.assign.right->u.var_name);
+			
+			fprintf(global_stream, "lw $ra, 0($sp)\naddi $sp, $sp, 4\n");
+			if(cur->u.assign.left != NULL)
+			{
+				forleft = allocate(cur->u.single.op, list, reg_status); 
+				fprintf(global_stream, "move $%s, $v0\n", reglist[forleft]);
+			}
+			
 			break;
 		case ARG:
+			idx = i+1;
+			while(codes[idx]->code.kind == ARG)
+			{
+				idx ++;
+			}
+			argscnt = idx - i;
+			right = ensure(cur->u.single.op, list, reg_status);
+			rightitm = findOP(list,cur->u.single.op);
+			if(rightitm->remcnt == 1)
+			{
+				free_reg(rightitm, reg_status);
+			}
+			if(argscnt > 4)//push args to stack
+			{
+				fprintf(global_stream, "addi $sp, $sp, -4\nsw $%s, 0($sp)\n", reglist[right]);
+			}
+			else
+			{
+				fprintf(global_stream, "move $%s, $%s\n",reglist[3+argscnt], reglist[right]);
+			}		
 			break;
 		case RET:
 			right = ensure(cur->u.single.op, list, reg_status);
@@ -694,16 +787,44 @@ void SelectOC(InterCodes* codes, int start, int end)
 			fprintf(global_stream, "move $v0, $%s\nmove $sp, $fp\nlw $fp, 0($sp)\naddi $sp, $sp, 4\njr $ra\n", reglist[right]);
 			break;
 		case FUNCDEC:
+			
+			paramcnt = 0;
 			fprintf(global_stream, "%s:\n", cur->u.single.op->u.var_name);
 			fprintf(global_stream, "addi $sp, $sp, -4\nsw $fp, 0($sp)\nmove $fp, $sp\n");
 			curfpoff = 4;
 			fprintf(global_stream, "addi $sp, $sp, -%i\n", list_len*4);
 			break;
 		case PARAM:
+			forleft = allocate(cur->u.single.op, list, reg_status); 
+			if(paramcnt < 4)
+			{
+				fprintf(global_stream, "move $%s, $%s\n", reglist[forleft], reglist[4+paramcnt]);
+			}
+			else
+			{
+				fprintf(global_stream, "lw $%s, %i($fp)\n", reglist[forleft], (paramcnt-2)*4);
+			}
+			paramcnt++;
 			break;
 		case DEC: 
 			get_place_for_array(cur->u.dec.var, cur->u.dec.size);
+			fprintf(global_stream, "addi $sp, $sp, -%i\n", cur->u.dec.size);
 			break;
+		}
+		
+		//printf("at end: i is %i, spilled %i\n", i, spilled);
+		if(i == end-1 && spilled == 0)
+		{
+			itr = list;
+			while(itr != NULL)
+			{
+				if(itr->reg != 0&&(itr->op->kind == VARI || itr->op->kind == ADDRESS ||itr->op->kind == TEMP ||itr->op->kind == TEMPADDRESS))
+				{
+					spill(itr,reg_status);
+				}
+				itr = itr->next;
+			}
+			spilled  = 1;
 		}
 		//spill all to stack
 	}

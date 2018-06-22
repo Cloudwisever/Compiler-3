@@ -125,8 +125,11 @@ int main(int argc, char** argv)
 		InterCodes IRtable = translate_Program(Syntax_Root, symbol_table);
 		IRtablePrint(stdout, IRtable);
 		
-		global_stream = stdout;
-		GenerateObjectCode(IRtable);
+		if(argc > 3)
+		{
+			global_stream = stdout;
+			GenerateObjectCode(IRtable);
+		}
 		
 		if(argc <= 2)
 		{
@@ -141,11 +144,14 @@ int main(int argc, char** argv)
 			return 1;
 		}
 		else
-			IRtablePrint(f, IRtable);
+		{
+			global_stream = f;
+			GenerateObjectCode(IRtable);
+		}
 		if(argc <= 3)
 		{
 			Syntax_Tree_Free(Syntax_Root);
-			return 1;
+			return 0;
 		}
 		
 		FILE* f2 = fopen(argv[3], "w");
